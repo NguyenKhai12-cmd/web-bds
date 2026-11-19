@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bài viết</title>
+<meta name="description" content="Tin tức bất động sản.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="logo" href="index.html" data-brand>&nbsp;</a>
+    <nav><a href="index.html#du-an">Dự án</a><a href="tin-tuc.html">Tin tức</a><a href="index.html#lien-he">Liên hệ</a></nav>
+    <a class="btn" href="index.html#lien-he">Nhận tư vấn</a>
+  </div>
+</header>
+
+<main class="p-sec"><article class="wrap" style="max-width:780px" id="post"><p style="color:var(--muted)">Đang tải…</p></article></main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 <span data-brand></span>.</span>
+    <span><a href="chinh-sach-bao-mat.html">Chính sách bảo mật</a> · <a href="tin-tuc.html">← Tất cả tin tức</a></span>
+  </div>
+</footer>
+<script src="assets/config.js"></script>
+<script src="assets/site.js"></script>
+<script src="projects.js"></script>
+<script>
+const slug = new URLSearchParams(location.search).get("slug") || "";
+const fail = msg => $("#post").innerHTML = `<h2>${msg}</h2><p style="margin:16px 0"><a class="btn" href="tin-tuc.html">Xem tất cả tin tức</a></p>`;
+if (!/^[a-z0-9-]+$/.test(slug)) fail("Không tìm thấy bài viết");
+else apiGet({action: "post", slug}).then(r => {
+  if (!r.ok) return fail("Không tìm thấy bài viết");
+  const p = r.post, proj = projects.find(x => x.slug === p.project);
+  document.title = p.title;
+  document.querySelector('meta[name="description"]').content = p.summary || p.title;
+  $("#post").innerHTML = `
+    <a class="crumb" href="tin-tuc.html" style="color:var(--muted)">← Tin tức</a>
+    <h1 style="font:700 clamp(28px,4.5vw,44px)/1.2 'Playfair Display',serif;color:var(--brand);margin:12px 0">${esc(p.title)}</h1>
+    <p style="color:var(--muted);margin-bottom:20px">${fmtDate(p.createdAt)}${proj ? ` · Dự án <a href="du-an.html?slug=${proj.slug}">${esc(proj.name)}</a>` : ""}</p>
+    ${safeUrl(p.cover) ? `<img src="${esc(p.cover)}" alt="" style="width:100%;border-radius:var(--radius);margin-bottom:24px">` : ""}
+    ${p.summary ? `<p style="font-size:18px;font-weight:500;margin-bottom:20px">${esc(p.summary)}</p>` : ""}
+    <div class="rich">${renderMd(p.content)}</div>
+    ${proj ? `<p style="margin-top:32px"><a class="btn" href="du-an.html?slug=${proj.slug}#lien-he">Nhận bảng giá ${esc(proj.name)}</a></p>` : ""}`;
+}).catch(() => fail("Không tải được bài viết, vui lòng thử lại sau"));
+</script>
+</body>
+</html>

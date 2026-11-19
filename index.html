@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dự án Bất động sản nổi bật</title>
+<meta name="description" content="Giới thiệu các dự án bất động sản cao tầng, thấp tầng nổi bật trên toàn quốc.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#" data-brand>&nbsp;</a>
+    <nav>
+      <a href="#du-an">Dự án</a>
+      <a href="#vi-sao">Vì sao chọn chúng tôi</a>
+      <a href="tin-tuc.html">Tin tức</a>
+      <a href="#lien-he">Liên hệ</a>
+    </nav>
+    <a class="btn" href="#lien-he">Nhận tư vấn</a>
+  </div>
+</header>
+
+<div class="hero" style="background-image:linear-gradient(180deg,rgba(10,30,24,.55) 0%,rgba(10,30,24,.9) 100%),url(img/612.jpg)">
+  <div class="wrap">
+    <div class="eyebrow">Dự án đang bán chạy 2026</div>
+    <h1>Chọn đúng nơi an cư, đúng thời điểm đầu tư</h1>
+    <p>Tuyển chọn các đại đô thị và tổ hợp căn hộ nổi bật từ Bắc vào Nam, với thông tin rõ ràng và tư vấn tận tâm.</p>
+    <div class="actions">
+      <a class="btn" href="#du-an">Xem dự án</a>
+      <a class="btn ghost" href="#lien-he">Đăng ký nhận bảng giá</a>
+    </div>
+    <div class="stats">
+      <div><b id="stat-total">179</b><span>Dự án trên toàn quốc</span></div>
+      <div><b>3</b><span>Miền Bắc · Trung · Nam</span></div>
+      <div><b>24/7</b><span>Hỗ trợ tư vấn</span></div>
+    </div>
+  </div>
+</div>
+
+<section id="du-an">
+  <div class="wrap">
+    <div class="head">
+      <h2>Danh sách dự án</h2>
+      <p>Lọc theo loại hình, khu vực hoặc tìm theo tên. Bấm vào một dự án để xem chi tiết: vị trí, sản phẩm, mặt bằng, tiện ích.</p>
+    </div>
+    <div class="filters" role="group" aria-label="Bộ lọc dự án">
+      <button class="chip" data-f="type" data-v="" aria-pressed="true">Tất cả</button>
+      <button class="chip" data-f="type" data-v="Cao tầng" aria-pressed="false">Cao tầng</button>
+      <button class="chip" data-f="type" data-v="Thấp tầng" aria-pressed="false">Thấp tầng</button>
+      <span style="width:12px"></span>
+      <button class="chip" data-f="region" data-v="Bắc" aria-pressed="false">Miền Bắc</button>
+      <button class="chip" data-f="region" data-v="Trung" aria-pressed="false">Miền Trung</button>
+      <button class="chip" data-f="region" data-v="Nam" aria-pressed="false">Miền Nam</button>
+      <select class="chip" id="investor" aria-label="Chủ đầu tư"><option value="">Tất cả chủ đầu tư</option></select>
+      <select class="chip" id="status" aria-label="Trạng thái"><option value="">Mọi trạng thái</option><option value="soon">Sắp mở bán</option><option value="selling">Đang bán</option><option value="hot">Dự án HOT</option></select>
+      <select class="chip" id="sort" aria-label="Sắp xếp"><option value="">Sắp xếp: Nổi bật</option><option value="price-asc">Giá thấp → cao</option><option value="price-desc">Giá cao → thấp</option><option value="views">Xem nhiều nhất</option></select>
+      <input class="search" type="search" placeholder="Tìm tên dự án, địa điểm…" aria-label="Tìm dự án">
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="empty">Không có dự án phù hợp với bộ lọc.</p>
+    <p style="text-align:center;margin-top:32px"><span id="count" style="display:block;color:var(--muted);margin-bottom:12px"></span><button class="btn" id="more">Xem thêm dự án</button></p>
+  </div>
+</section>
+
+<section class="why" id="vi-sao">
+  <div class="wrap">
+    <h2>Vì sao chọn chúng tôi</h2>
+    <div class="cols">
+      <div><h3>Thông tin minh bạch</h3><p>Pháp lý, tiến độ và chính sách bán hàng được cập nhật trực tiếp từ chủ đầu tư.</p></div>
+      <div><h3>Giá tốt nhất</h3><p>Bảng giá gốc, chiết khấu và ưu đãi thanh toán mới nhất cho từng đợt mở bán.</p></div>
+      <div><h3>Tư vấn 1-1</h3><p>Chuyên viên am hiểu từng dự án, đồng hành từ tham quan nhà mẫu đến bàn giao.</p></div>
+      <div><h3>Hỗ trợ tài chính</h3><p>Kết nối ngân hàng, tính toán phương án vay và dòng tiền phù hợp.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="lien-he">
+  <div class="wrap contact">
+    <div>
+      <h2>Nhận bảng giá &amp; tư vấn</h2>
+      <p style="color:var(--muted);margin-top:12px">Để lại thông tin, chuyên viên sẽ liên hệ trong vòng 30 phút (giờ hành chính).</p>
+      <ul data-contact></ul>
+    </div>
+    <form id="form">
+      <label>Họ và tên<input name="name" required autocomplete="name"></label>
+      <label>Số điện thoại<input name="phone" type="tel" required pattern="[0-9 +.]{9,15}" autocomplete="tel"></label>
+      <label>Dự án quan tâm<select name="project" id="project-select"><option value="">— Chọn dự án —</option></select></label>
+      <label>Ghi chú<textarea name="note" rows="3"></textarea></label>
+      <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+      <button class="btn" type="submit">Gửi đăng ký</button>
+      <p style="font-size:13px;color:var(--muted)">Bằng việc gửi đăng ký, bạn đồng ý để chúng tôi liên hệ tư vấn theo <a href="chinh-sach-bao-mat.html">Chính sách bảo mật</a>.</p>
+      <p class="ok" id="ok" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 <span data-brand></span>. Hình ảnh và thông tin dự án mang tính tham khảo.</span>
+    <span><a href="chinh-sach-bao-mat.html">Chính sách bảo mật</a> · <a href="#">Lên đầu trang ↑</a></span>
+  </div>
+</footer>
+
+<script src="assets/config.js"></script>
+<script src="assets/site.js"></script>
+<script src="projects.js"></script>
+<script>
+const PAGE = 24;
+const KEYS = ["type", "region", "investor", "status", "sort", "q"];
+// bộ lọc lưu trên URL (?type=…&region=…) để chia sẻ link và giữ khi bấm Back
+const url = new URLSearchParams(location.search);
+const state = Object.fromEntries(KEYS.map(k => [k, url.get(k) || ""]));
+state.shown = PAGE;
+
+const STATUS = {soon: p => p.soon, selling: p => !p.soon, hot: p => p.hot};
+const SORT = {
+  "price-asc": (a, b) => (a.price || Infinity) - (b.price || Infinity), // dự án chưa có giá xếp cuối
+  "price-desc": (a, b) => b.price - a.price,
+  views: (a, b) => b.views - a.views,
+};
+
+function syncControls(){
+  document.querySelectorAll("button.chip").forEach(c => c.setAttribute("aria-pressed", state[c.dataset.f] === c.dataset.v));
+  for (const k of ["investor", "status", "sort"]) $("#" + k).value = state[k];
+  $(".search").value = state.q;
+}
+
+function render(){
+  const u = new URLSearchParams(KEYS.filter(k => state[k]).map(k => [k, state[k]]));
+  history.replaceState(null, "", (u.toString() ? "?" + u : location.pathname) + location.hash);
+  const q = norm(state.q);
+  const list = projects.filter(p => (!state.type || p.type===state.type) && (!state.region || p.region===state.region) && (!state.investor || p.investor===state.investor) && (!state.status || STATUS[state.status]?.(p)) && (!q || norm(p.name+" "+p.addr+" "+p.investor).includes(q)));
+  if (SORT[state.sort]) list.sort(SORT[state.sort]);
+  $("#more").style.display = list.length > state.shown ? "" : "none";
+  $("#count").textContent = list.length ? `Đang hiển thị ${Math.min(state.shown, list.length)} / ${list.length} dự án` : "";
+  $("#grid").innerHTML = list.slice(0, state.shown).map(p => `
+    <a class="card" href="du-an.html?slug=${p.slug}" style="text-decoration:none">
+      <figure><img src="${p.img}" alt="${esc(p.name)}" loading="lazy"><div class="tags">${tagsHtml(p)}</div></figure>
+      <div class="body"><h3>${esc(p.name)}</h3><p class="slogan">${esc(p.slogan)}</p>${meta(p) ? `<p class="addr" style="margin-top:0">${meta(p)}</p>` : ""}<p class="addr">📍 ${esc(p.addr)}</p></div>
+    </a>`).join("");
+  $("#empty").style.display = list.length ? "none" : "block";
+}
+
+const set = (k, v) => { state[k] = v; state.shown = PAGE; syncControls(); render(); };
+document.querySelectorAll("button.chip").forEach(b => b.onclick = () =>
+  set(b.dataset.f, state[b.dataset.f]===b.dataset.v && b.dataset.f==="region" ? "" : b.dataset.v)); // bấm lại khu vực để bỏ lọc
+$(".search").oninput = e => { state.q = e.target.value; state.shown = PAGE; render(); };
+$("#investor").innerHTML += [...new Set(projects.map(p => p.investor).filter(Boolean))].sort().map(i => `<option>${esc(i)}</option>`).join("");
+for (const k of ["investor", "status", "sort"]) $("#" + k).onchange = e => set(k, e.target.value);
+$("#more").onclick = () => { state.shown += PAGE; render(); };
+
+$("#project-select").innerHTML += projects.map(p => `<option>${esc(p.name)}</option>`).join("");
+$("#stat-total").textContent = projects.length;
+
+// giá trị lạ trên URL (link cũ/gõ sai) thì bỏ, tránh lọc ra danh sách rỗng mà ô chọn lại hiện "Tất cả"
+for (const k of ["investor", "status", "sort"]) if (![...$("#" + k).options].some(o => o.value === state[k])) state[k] = "";
+syncControls();
+render();
+</script>
+</body>
+</html>

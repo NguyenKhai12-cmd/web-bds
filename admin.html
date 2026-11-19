@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Quản trị bài viết</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.adm{padding:40px 0 80px}
+.adm h2{margin-bottom:20px}
+.login{max-width:420px;margin:60px auto}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.bar .search{margin-left:0}
+.tbl{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.tbl th,.tbl td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);font-size:15px;vertical-align:middle}
+.tbl th{font-size:13px;color:var(--muted);font-weight:600;background:var(--bg)}
+.tbl td.act{white-space:nowrap;text-align:right}
+.st{font-size:12px;font-weight:600;padding:3px 10px;border-radius:6px;background:var(--line);color:var(--ink)}
+.st.published{background:#d7eadf;color:var(--brand)}
+.link{background:none;border:0;color:var(--brand);font:600 14px inherit;font-family:inherit;cursor:pointer;padding:4px 8px;text-decoration:none}
+.link.danger{color:#b03a2e}
+.editor{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.editor form{padding:24px}
+.editor textarea[name=content]{min-height:420px;font:14px/1.6 ui-monospace,Consolas,monospace}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:12px;color:var(--muted);font-weight:400}
+.preview{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;position:sticky;top:80px;max-height:calc(100vh - 100px);overflow:auto}
+.preview .cover{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin-bottom:16px}
+.msg{font-weight:600;min-height:1.6em}
+.msg.err{color:#b03a2e}.msg.good{color:var(--brand)}
+@media (max-width:900px){.editor{grid-template-columns:1fr}.preview{position:static;max-height:none}.tbl .hide-sm{display:none}}
+</style>
+</head>
+<body data-admin>
+<header>
+  <div class="wrap">
+    <a class="logo" href="index.html" data-brand>&nbsp;</a>
+    <nav><span style="color:var(--muted)">Quản trị bài viết</span></nav>
+    <span id="who" style="font-size:14px;color:var(--muted)"></span>
+  </div>
+</header>
+
+<main class="wrap adm" id="app"></main>
+
+<script src="assets/config.js"></script>
+<script src="assets/site.js"></script>
+<script src="projects.js"></script>
+<script>
+// Phiên đăng nhập chỉ giữ trong tab này (đóng tab là phải đăng nhập lại)
+const store = {
+  get: () => { try { return sessionStorage.getItem("adm_token") || ""; } catch { return ""; } },
+  set: v => { try { v ? sessionStorage.setItem("adm_token", v) : sessionStorage.removeItem("adm_token"); } catch {} },
+};
+let token = store.get(), posts = [], dirty = false;
+const app = $("#app");
+const slugify = s => norm(s).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
+
+async function call(body){
+  const r = await apiPost({...body, token});
+  if (r.auth === false) { store.set(token = ""); showLogin(r.error); throw new Error(r.error); }
+  return r;
+}
+
+// ---------- đăng nhập ----------
+function showLogin(err = ""){
+  $("#who").textContent = "";
+  app.innerHTML = `<form class="login" id="login">
+      <h2>Đăng nhập quản trị</h2>
+      <label>Tên đăng nhập<input name="user" required autocomplete="username"></label>
+      <label>Mật khẩu<input name="pass" type="password" required autocomplete="current-password"></label>
+      <button class="btn" type="submit">Đăng nhập</button>
+      <p class="msg err" id="lmsg">${esc(err || (SITE.apiUrl ? "" : "Chưa cấu hình apiUrl trong assets/config.js (xem HUONG_DAN.md)."))}</p>
+    </form>`;
+  $("#login").onsubmit = async e => {
+    e.preventDefault();
+    const f = e.target, btn = f.querySelector("button");
+    btn.disabled = true; $("#lmsg").textContent = "";
+    try {
+      const r = await apiPost({action: "login", user: f.user.value, pass: f.pass.value});
+      if (!r.ok) throw new Error(r.error);
+      store.set(token = r.token);
+      loadList();
+    } catch (err) { $("#lmsg").textContent = err.message || "Không kết nối được máy chủ"; }
+    finally { btn.disabled = false; }
+  };
+}
+
+// ---------- danh sách bài ----------
+async function loadList(){
+  app.innerHTML = `<p style="color:var(--muted)">Đang tải…</p>`;
+  try {
+    const r = await call({action: "list"});
+    if (!r.ok) throw new Error(r.error);
+    posts = r.posts.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+    $("#who").innerHTML = `${esc(r.user)} · <button class="link" id="logout">Đăng xuất</button>`;
+    $("#logout").onclick = async () => { try { await call({action: "logout"}); } catch {} store.set(token = ""); showLogin(); };
+    showList();
+  } catch (err) { if (token) app.innerHTML = `<p class="msg err">${esc(err.message)}</p><button class="btn" onclick="loadList()">Thử lại</button>`; }
+}
+
+function showList(q = ""){
+  dirty = false;
+  const nq = norm(q), list = posts.filter(p => !nq || norm(p.title + " " + p.slug).includes(nq));
+  app.innerHTML = `<h2>Bài viết (${posts.length})</h2>
+    <div class="bar"><button class="btn" id="new">+ Viết bài mới</button>
+      <input class="search" id="q" type="search" placeholder="Tìm bài viết…" value="${esc(q)}" aria-label="Tìm bài viết"></div>
+    ${list.length ? `<table class="tbl"><thead><tr><th>Tiêu đề</th><th>Trạng thái</th><th class="hide-sm">Cập nhật</th><th class="hide-sm">Người viết</th><th></th></tr></thead><tbody>
+      ${list.map(p => `<tr><td><b>${esc(p.title)}</b><br><span class="hint">/${esc(p.slug)}</span></td>
+        <td><span class="st ${p.status}">${p.status === "published" ? "Đã đăng" : "Nháp"}</span></td>
+        <td class="hide-sm">${fmtDate(p.updatedAt)}</td><td class="hide-sm">${esc(p.author)}</td>
+        <td class="act">${p.status === "published" ? `<a class="link" href="bai-viet.html?slug=${encodeURIComponent(p.slug)}" target="_blank">Xem</a>` : ""}
+          <button class="link" data-edit="${esc(p.id)}">Sửa</button><button class="link danger" data-del="${esc(p.id)}">Xóa</button></td></tr>`).join("")}
+    </tbody></table>` : `<p style="color:var(--muted)">${posts.length ? "Không có bài phù hợp." : "Chưa có bài viết nào. Bấm “Viết bài mới” để bắt đầu."}</p>`}`;
+  $("#new").onclick = () => showEditor({status: "draft"});
+  $("#q").oninput = e => { const v = e.target.value; showList(v); const i = $("#q"); i.focus(); i.setSelectionRange(v.length, v.length); };
+  app.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => showEditor(posts.find(p => p.id === b.dataset.edit)));
+  app.querySelectorAll("[data-del]").forEach(b => b.onclick = async () => {
+    const p = posts.find(x => x.id === b.dataset.del);
+    if (!confirm(`Xóa vĩnh viễn bài “${p.title}”? Không thể hoàn tác.`)) return;
+    b.disabled = true;
+    try { const r = await call({action: "delete", id: p.id}); if (!r.ok) throw new Error(r.error); posts = posts.filter(x => x !== p); showList(q); }
+    catch (err) { alert(err.message); b.disabled = false; }
+  });
+}
+
+// ---------- soạn bài ----------
+function showEditor(p){
+  dirty = false;
+  app.innerHTML = `<div class="bar"><button class="link" id="back">← Danh sách bài</button></div>
+    <div class="editor">
+      <form id="ed">
+        <label>Tiêu đề<input name="title" required maxlength="200" value="${esc(p.title || "")}"></label>
+        <label>Đường dẫn <span class="hint">(để trống sẽ tự tạo từ tiêu đề)</span><input name="slug" maxlength="80" pattern="[a-z0-9-]*" value="${esc(p.slug || "")}" placeholder="vi-du-bai-viet"></label>
+        <label>Tóm tắt <span class="hint">(hiện ở danh sách tin, tối đa 500 ký tự)</span><textarea name="summary" rows="2" maxlength="500">${esc(p.summary || "")}</textarea></label>
+        <label>Ảnh bìa <span class="hint">(link ảnh https://…)</span><input name="cover" type="url" pattern="https://.*" value="${esc(p.cover || "")}"></label>
+        <div class="row2">
+          <label>Dự án liên quan<select name="project"><option value="">— Không —</option>${projects.map(x => `<option value="${x.slug}" ${x.slug === p.project ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
+          <label>Trạng thái<select name="status"><option value="draft">Nháp (ẩn)</option><option value="published" ${p.status === "published" ? "selected" : ""}>Đăng công khai</option></select></label>
+        </div>
+        <label>Nội dung <span class="hint">## Tiêu đề mục · **đậm** · *nghiêng* · - gạch đầu dòng · [chữ](https://link) · ![mô tả](https://link-anh) · dòng trống = đoạn mới</span>
+          <textarea name="content" maxlength="45000">${esc(p.content || "")}</textarea></label>
+        <button class="btn" type="submit">Lưu bài viết</button>
+        <p class="msg" id="emsg" role="status"></p>
+      </form>
+      <article class="preview" aria-label="Xem trước"><p class="hint" style="margin-bottom:8px">XEM TRƯỚC</p><div id="pv"></div></article>
+    </div>`;
+  const f = $("#ed");
+  const preview = () => {
+    const cover = safeUrl(f.cover.value.trim());
+    $("#pv").innerHTML = `${cover ? `<img class="cover" src="${esc(cover)}" alt="">` : ""}<h2>${esc(f.title.value || "Tiêu đề bài viết")}</h2>
+      ${f.summary.value ? `<p style="color:var(--muted);margin:8px 0 16px">${esc(f.summary.value)}</p>` : ""}<div class="rich">${renderMd(f.content.value)}</div>`;
+  };
+  f.oninput = e => { dirty = true; if (e.target === f.title && !p.id && !f.slug.dataset.touched) f.slug.value = slugify(f.title.value); if (e.target === f.slug) f.slug.dataset.touched = 1; preview(); };
+  preview();
+  $("#back").onclick = () => (!dirty || confirm("Bỏ các thay đổi chưa lưu?")) && showList();
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const btn = f.querySelector("button[type=submit]"), msg = $("#emsg");
+    btn.disabled = true; msg.className = "msg"; msg.textContent = "Đang lưu…";
+    try {
+      const data = Object.fromEntries(new FormData(f));
+      const r = await call({action: "save", post: {...data, id: p.id || ""}});
+      if (!r.ok) throw new Error(r.error);
+      const i = posts.findIndex(x => x.id === r.post.id);
+      i < 0 ? posts.push(r.post) : (posts[i] = r.post);
+      p = r.post; f.slug.value = p.slug; dirty = false;
+      msg.className = "msg good"; msg.textContent = `Đã lưu lúc ${new Date().toLocaleTimeString("vi-VN")}` + (p.status === "published" ? " · đang hiển thị công khai" : " · bản nháp");
+    } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
+    finally { btn.disabled = false; }
+  };
+}
+
+window.addEventListener("beforeunload", e => { if (dirty) e.preventDefault(); });
+token ? loadList() : showLogin();
+</script>
+</body>
+</html>

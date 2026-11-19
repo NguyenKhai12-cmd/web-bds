@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tin tức bất động sản</title>
+<meta name="description" content="Tin tức, phân tích thị trường và cập nhật mới nhất về các dự án bất động sản.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="logo" href="index.html" data-brand>&nbsp;</a>
+    <nav><a href="index.html#du-an">Dự án</a><a href="tin-tuc.html">Tin tức</a><a href="index.html#lien-he">Liên hệ</a></nav>
+    <a class="btn" href="index.html#lien-he">Nhận tư vấn</a>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="head"><h2>Tin tức</h2><input class="search" id="q" type="search" placeholder="Tìm bài viết…" aria-label="Tìm bài viết"></div>
+    <div class="grid" id="grid"><p style="color:var(--muted)">Đang tải…</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 <span data-brand></span>.</span>
+    <span><a href="chinh-sach-bao-mat.html">Chính sách bảo mật</a> · <a href="index.html">Trang chủ</a></span>
+  </div>
+</footer>
+<script src="assets/config.js"></script>
+<script src="assets/site.js"></script>
+<script src="projects.js"></script>
+<script>
+let posts = [];
+const projName = s => (projects.find(p => p.slug === s) || {}).name || "";
+function render(){
+  const q = norm($("#q").value), list = posts.filter(p => !q || norm(p.title + " " + p.summary + " " + projName(p.project)).includes(q));
+  $("#grid").innerHTML = list.length ? list.map(p => `
+    <a class="card" href="bai-viet.html?slug=${encodeURIComponent(p.slug)}" style="text-decoration:none">
+      ${safeUrl(p.cover) ? `<figure><img src="${esc(p.cover)}" alt="" loading="lazy"></figure>` : ""}
+      <div class="body"><p class="addr" style="margin:0">${fmtDate(p.createdAt)}${p.project ? " · " + esc(projName(p.project)) : ""}</p>
+        <h3>${esc(p.title)}</h3><p class="slogan">${esc(p.summary)}</p></div>
+    </a>`).join("") : `<p style="color:var(--muted)">${posts.length ? "Không có bài phù hợp." : "Chưa có bài viết nào."}</p>`;
+}
+$("#q").oninput = render;
+apiGet({action: "posts"}).then(r => { posts = r.ok ? r.posts : []; render(); })
+  .catch(() => { posts = []; render(); });
+</script>
+</body>
+</html>
