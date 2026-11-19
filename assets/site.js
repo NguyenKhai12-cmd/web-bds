@@ -17,6 +17,30 @@ if ((SITE.hotline || SITE.zalo) && !("admin" in document.body.dataset)) document
   ${SITE.zalo ? `<a href="https://zalo.me/${esc(SITE.zalo)}" target="_blank" rel="noopener" class="zalo" aria-label="Chat Zalo">Zalo</a>` : ""}
   ${SITE.hotline ? `<a href="tel:${esc(SITE.hotline)}" class="call" aria-label="Gọi hotline">📞</a>` : ""}</div>`);
 
+// ---------- menu trên điện thoại / máy tính bảng ----------
+const topNav = document.querySelector("header nav");
+if (topNav && !("admin" in document.body.dataset)) {
+  topNav.id = "site-nav";
+  const cta = document.querySelector("header .btn");
+  if (cta) topNav.insertAdjacentHTML("beforeend", `<a class="btn nav-cta" href="${cta.getAttribute("href")}">${cta.textContent}</a>`);
+  const tg = document.createElement("button");
+  tg.className = "nav-toggle";
+  tg.setAttribute("aria-controls", "site-nav");
+  tg.setAttribute("aria-expanded", "false");
+  tg.setAttribute("aria-label", "Mở menu");
+  tg.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`;
+  document.querySelector("header .wrap").append(tg);
+  const setOpen = open => {
+    document.body.classList.toggle("nav-open", open);
+    tg.setAttribute("aria-expanded", open);
+    tg.setAttribute("aria-label", open ? "Đóng menu" : "Mở menu");
+  };
+  tg.onclick = () => setOpen(!document.body.classList.contains("nav-open"));
+  topNav.addEventListener("click", e => { if (e.target.closest("a")) setOpen(false); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && document.body.classList.contains("nav-open")) { setOpen(false); tg.focus(); } });
+  matchMedia("(min-width: 901px)").addEventListener("change", e => e.matches && setOpen(false));
+}
+
 // ---------- form đăng ký tư vấn ----------
 const form = $("#form");
 if (form) form.onsubmit = async e => {
